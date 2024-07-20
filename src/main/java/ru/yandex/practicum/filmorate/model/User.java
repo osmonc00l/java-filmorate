@@ -9,7 +9,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 
 @Data
-@Slf4j
 public class User {
     Long id;
     String email;

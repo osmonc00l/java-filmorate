@@ -12,7 +12,6 @@ import java.time.LocalDate;
  * Film.
  */
 @Data
-@Slf4j
 public class Film {
     Long id;
     String name;
