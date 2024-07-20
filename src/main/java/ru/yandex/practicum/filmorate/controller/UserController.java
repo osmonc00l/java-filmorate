@@ -17,6 +17,7 @@ import java.util.Objects;
 @Slf4j
 public class UserController {
     private final Map<Long, User> users = new HashMap<>();
+
     @GetMapping
     public Collection<User> findAllFilms() {
         return users.values();
@@ -32,7 +33,9 @@ public class UserController {
 
         user.setId(getNextId());
         log.debug("Новому пользователю присвоен id {}", user.getId());
-        if (Objects.isNull(user.getName()) || user.getName().isBlank()) { user.setName(user.getLogin());}
+        if (Objects.isNull(user.getName()) || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
 
         users.put(user.getId(), user);
         log.debug("Пользователь с id {} был добавлен", user.getId());
