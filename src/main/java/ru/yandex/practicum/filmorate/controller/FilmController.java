@@ -26,9 +26,11 @@ public class FilmController {
     @PostMapping
     public Film createFilm(@RequestBody Film film) {
         String isValid = checkIfValid(film);
+
         if (!isValid.isEmpty()) {
             throw new ValidationException(isValid);
         }
+
         log.info("Валидация прошла успешно");
         film.setId(getNextId());
         log.debug("Фильму был присвоен новый id {}", film.getId());
