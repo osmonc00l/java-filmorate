@@ -26,7 +26,9 @@ public class FilmController {
     @PostMapping
     public Film createFilm(@RequestBody Film film) {
         String isValid = checkIfValid(film);
-        if (!isValid.isEmpty()) {throw new ValidationException(isValid);}
+        if (!isValid.isEmpty()) {
+            throw new ValidationException(isValid);
+        }
         log.info("Валидация прошла успешно");
         film.setId(getNextId());
         log.debug("Фильму был присвоен новый id {}", film.getId());
@@ -64,7 +66,7 @@ public class FilmController {
     public String checkIfValid(Film film) {
         if (Objects.isNull(film.getName()) || film.getName().isBlank()) {
             return "Название не может быть пустым";
-        } else if (film.getDescription().length() > 200){
+        } else if (film.getDescription().length() > 200) {
             return "Максимальная длина описания — 200 символов";
         } else if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             return "Дата релиза — не раньше 28 декабря 1895 года;";
