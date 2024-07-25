@@ -53,9 +53,9 @@ class FilmControllerTests {
 	@Test
 	void shouldNotPassValidationByDateTime() {
 		Film someFilm = new Film();
-		someFilm.setName("Фантомас");
-		someFilm.setDescription("Первый фильм трилогии о невероятных приключениях комиссара Жюва, преследующего неуловимого преступника Фантомаса.");
-		someFilm.setReleaseDate(LocalDate.of(1964, 11, 4));
+		someFilm.setName("Фильм");
+		someFilm.setDescription("123");
+		someFilm.setReleaseDate(LocalDate.of(1863, 12, 4));
 		someFilm.setDuration(104);
 
 		assertThrows(ValidationException.class, () -> filmController.createFilm(someFilm));
