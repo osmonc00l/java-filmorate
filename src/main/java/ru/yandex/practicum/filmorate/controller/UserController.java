@@ -67,8 +67,8 @@ public class UserController {
         throw new NotFoundException("Пользователь с id = " + newUser.getId() + " не найден");
     }
 
-    public String checkIfValid(User user) {
-        if (user.getEmail().isEmpty() || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
+    private String checkIfValid(User user) {
+        if (Objects.isNull(user.getEmail()) || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
             return "Электронная почта не может быть пустой и должна содержать символ @";
         } else if (user.getLogin() == null || user.getLogin().isBlank() || user.getLogin().contains(" ")) {
             return "Логин не может быть пустым и содержать пробелы";

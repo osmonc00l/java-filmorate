@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -50,25 +51,16 @@ public class FilmController {
             throw new ValidationException(isValid);
         }
         if (films.containsKey(newFilm.getId())) {
-            Film oldFilm = films.get(newFilm.getId());
-
-            oldFilm.setName(newFilm.getName());
-            log.debug("Фильм {} поменял название на {}", newFilm.getId(), newFilm.getName());
-            oldFilm.setDescription(newFilm.getDescription());
-            log.debug("Фильм {} поменял описание на {}", newFilm.getId(), newFilm.getDescription());
-            oldFilm.setReleaseDate(newFilm.getReleaseDate());
-            log.debug("Фильм {} поменял дату релиза на {}", newFilm.getId(), newFilm.getReleaseDate());
-            oldFilm.setDuration(newFilm.getDuration());
-            log.debug("Фильм {} поменял продолжительность на {}", newFilm.getId(), newFilm.getDuration());
-            return oldFilm;
+            films.put(newFilm.getId(), newFilm);
+            return newFilm;
         }
         throw new NotFoundException("Фильм с id = " + newFilm.getId() + " не найден");
     }
 
-    public String checkIfValid(Film film) {
+    private String checkIfValid(Film film) {
         if (Objects.isNull(film.getName()) || film.getName().isBlank()) {
             return "Название не может быть пустым";
-        } else if (film.getDescription().length() > 200) {
+        } else if (Objects.isNull(film.getDescription()) || film.getDescription().length() > 200) {
             return "Максимальная длина описания — 200 символов";
         } else if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             return "Дата релиза — не раньше 28 декабря 1895 года;";
