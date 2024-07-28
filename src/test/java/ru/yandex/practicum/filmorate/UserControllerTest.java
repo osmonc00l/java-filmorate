@@ -2,9 +2,10 @@ package ru.yandex.practicum.filmorate;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.time.LocalDate;
 
@@ -12,11 +13,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class UserControllerTest {
-    private static UserController userController;
+    private static UserService userService;
 
     @BeforeEach
     void beforeEach() {
-        userController = new UserController();
+        userService = new UserService(new InMemoryUserStorage());
     }
 
     @Test
@@ -27,9 +28,9 @@ public class UserControllerTest {
         someUser.setName("fasdfas");
         someUser.setBirthday(LocalDate.of(2003, 12, 6));
 
-        assertThrows(ValidationException.class, () -> userController.createUser(someUser));
+        assertThrows(ValidationException.class, () -> userService.createUser(someUser));
 
-        assertTrue(userController.findAllUsers().isEmpty());
+        assertTrue(userService.getUsers().isEmpty());
     }
 
     @Test
@@ -40,9 +41,9 @@ public class UserControllerTest {
         someUser.setName("dfsghdf");
         someUser.setBirthday(LocalDate.of(2001, 6, 12));
 
-        assertThrows(ValidationException.class, () -> userController.createUser(someUser));
+        assertThrows(ValidationException.class, () -> userService.createUser(someUser));
 
-        assertTrue(userController.findAllUsers().isEmpty());
+        assertTrue(userService.getUsers().isEmpty());
     }
 
     @Test
@@ -53,8 +54,8 @@ public class UserControllerTest {
         someUser.setName("trsrtghnrt");
         someUser.setBirthday(LocalDate.now().plusDays(15));
 
-        assertThrows(ValidationException.class, () -> userController.createUser(someUser));
+        assertThrows(ValidationException.class, () -> userService.createUser(someUser));
 
-        assertTrue(userController.findAllUsers().isEmpty());
+        assertTrue(userService.getUsers().isEmpty());
     }
 }
