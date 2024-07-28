@@ -31,6 +31,7 @@ public class UserService {
             throw exception;
         }
     }
+
     public User updateUser(User newUser) {
         try {
             UserValidator.isValid(newUser);
