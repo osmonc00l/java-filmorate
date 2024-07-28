@@ -1,83 +1,66 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
-import java.time.LocalDate;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
-    private final Map<Long, Film> films = new HashMap<>();
+    private final FilmService filmService;
+    private final String likePath = "/{id}/like";
 
     @GetMapping
-    public Collection<Film> findAllFilms() {
-        return films.values();
+    public ResponseEntity<Collection<Film>> getFilms() {
+        return ResponseEntity
+                .status(200)
+                .body(filmService.getFilms());
     }
 
     @PostMapping
-    public Film createFilm(@RequestBody Film film) {
-        String isValid = checkIfValid(film);
-
-        if (!isValid.isEmpty()) {
-            throw new ValidationException(isValid);
-        }
-
-        log.info("Валидация прошла успешно");
-        film.setId(getNextId());
-        log.debug("Фильму был присвоен новый id {}", film.getId());
-        films.put(film.getId(), film);
-        log.info("Фильм с id {} был добавлен", film.getId());
-        return film;
+    public ResponseEntity<Film> createFilm(@Valid @RequestBody Film film) {
+        return ResponseEntity
+                .status(201)
+                .body(filmService.createFilm(film));
     }
 
     @PutMapping
-    public Film updateUser(@RequestBody Film newFilm) {
-        // проверяем необходимые условия
-        if (newFilm.getId() == null) {
-            throw new ValidationException("Id должен быть указан");
-        }
-        String isValid = checkIfValid(newFilm);
-        if (!isValid.isEmpty()) {
-            throw new ValidationException(isValid);
-        }
-        if (films.containsKey(newFilm.getId())) {
-            films.put(newFilm.getId(), newFilm);
-            return newFilm;
-        }
-        throw new NotFoundException("Фильм с id = " + newFilm.getId() + " не найден");
+    public ResponseEntity<Film> updateFilm(@Valid @RequestBody Film film) {
+        return ResponseEntity
+                .status(200)
+                .body(filmService.updateFilm(film));
     }
 
-    private String checkIfValid(Film film) {
-        if (Objects.isNull(film.getName()) || film.getName().isBlank()) {
-            return "Название не может быть пустым";
-        } else if (Objects.isNull(film.getDescription()) || film.getDescription().length() > 200) {
-            return "Максимальная длина описания — 200 символов";
-        } else if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            return "Дата релиза — не раньше 28 декабря 1895 года;";
-        } else if (film.getDuration() <= 0) {
-            return "Продолжительность фильма должна быть положительным числом.";
-        } else {
-            return "";
-        }
+    @PutMapping(likePath + "/{userId}")
+    public ResponseEntity<Film> likeFilm(@PathVariable long id, @PathVariable long userId) {
+        return ResponseEntity
+                .status(200)
+                .body(filmService.likeFilm(id, userId));
     }
 
-    private long getNextId() {
-        long currentMaxId = films.keySet()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
+    @DeleteMapping(likePath + "/{userId}")
+    public ResponseEntity<Film> removeFilm(@PathVariable long id, @PathVariable long userId) {
+        return ResponseEntity
+                .status(200)
+                .body(filmService.removeLike(id, userId));
     }
 
+    @GetMapping("/popular")
+    @ResponseBody
+    public ResponseEntity<List<Film>> getMostPopular(@RequestParam Optional<Long> count) {
+        return ResponseEntity
+                .status(200)
+                .body(filmService.getMostPopularFilms(count));
+    }
 }
