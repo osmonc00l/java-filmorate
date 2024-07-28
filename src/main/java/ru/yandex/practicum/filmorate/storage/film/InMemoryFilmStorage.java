@@ -13,7 +13,7 @@ import java.util.Map;
 @Slf4j
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
-    final Map<Long, Film> films = new HashMap<>();
+    private final Map<Long, Film> films = new HashMap<>();
 
     @Override
     public Film createFilm(Film film) {
@@ -56,7 +56,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         return films.containsKey(filmId);
     }
 
-    long getNextId() {
+    private long getNextId() {
         long currentMaxID = films.values().stream()
                 .mapToLong(Film::getId)
                 .max()

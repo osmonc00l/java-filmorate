@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @RequiredArgsConstructor
 class FilmControllerTests {
 
-	private static FilmService filmService;
+	private FilmService filmService;
 
 	@BeforeEach
 	void beforeEach() {

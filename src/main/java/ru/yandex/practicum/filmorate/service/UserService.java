@@ -77,7 +77,7 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    void doesUserExist(long... listId) {
+    private void doesUserExist(long... listId) {
         for (long id : listId) {
             if (!userStorage.doesUserExist(id)) {
                 throw new NotFoundException(String.format("Пользователь с ID=%d не найден", id));
