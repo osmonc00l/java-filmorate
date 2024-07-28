@@ -12,7 +12,7 @@ import java.util.Map;
 
 @Slf4j
 @Component
-public class InMemoryFilmStorage implements FilmStorage{
+public class InMemoryFilmStorage implements FilmStorage {
     final Map<Long, Film> films = new HashMap<>();
 
     @Override
@@ -25,7 +25,7 @@ public class InMemoryFilmStorage implements FilmStorage{
     }
 
     @Override
-    public Film updateFilm(Film film) throws NotFoundException{
+    public Film updateFilm(Film film) throws NotFoundException {
         if (film.getId() == null) {
             throw new ValidationException("Id должен быть указан");
         }
