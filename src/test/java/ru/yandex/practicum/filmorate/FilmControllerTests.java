@@ -1,24 +1,27 @@
 package ru.yandex.practicum.filmorate;
 
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-
+@RequiredArgsConstructor
 class FilmControllerTests {
 
-	private static FilmController filmController;
+	private FilmService filmService;
 
 	@BeforeEach
 	void beforeEach() {
-		filmController = new FilmController();
+		filmService = new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage());
 	}
 
 	@Test
@@ -30,9 +33,9 @@ class FilmControllerTests {
 		someFilm.setReleaseDate(LocalDate.of(2011, 5, 20));
 		someFilm.setDuration(100);
 
-		assertThrows(ValidationException.class, () -> filmController.createFilm(someFilm));
+		assertThrows(ValidationException.class, () -> filmService.createFilm(someFilm));
 
-		assertFalse(filmController.findAllFilms().contains(someFilm));
+		assertFalse(filmService.getFilms().contains(someFilm));
 	}
 
 	@Test
@@ -45,9 +48,9 @@ class FilmControllerTests {
 		someFilm.setReleaseDate(LocalDate.of(2006, 9, 26));
 		someFilm.setDuration(151);
 
-		assertThrows(ValidationException.class, () -> filmController.createFilm(someFilm));
+		assertThrows(ValidationException.class, () -> filmService.createFilm(someFilm));
 
-		assertFalse(filmController.findAllFilms().contains(someFilm));
+		assertFalse(filmService.getFilms().contains(someFilm));
 	}
 
 	@Test
@@ -58,9 +61,9 @@ class FilmControllerTests {
 		someFilm.setReleaseDate(LocalDate.of(1861, 12, 4));
 		someFilm.setDuration(104);
 
-		assertThrows(ValidationException.class, () -> filmController.createFilm(someFilm));
+		assertThrows(ValidationException.class, () -> filmService.createFilm(someFilm));
 
-		assertFalse(filmController.findAllFilms().contains(someFilm));
+		assertFalse(filmService.getFilms().contains(someFilm));
 	}
 
 	@Test
@@ -71,8 +74,8 @@ class FilmControllerTests {
 		someFilm.setReleaseDate(LocalDate.of(2003, 2, 3));
 		someFilm.setDuration(-90);
 
-		assertThrows(ValidationException.class, () -> filmController.createFilm(someFilm));
+		assertThrows(ValidationException.class, () -> filmService.createFilm(someFilm));
 
-		assertFalse(filmController.findAllFilms().contains(someFilm));
+		assertFalse(filmService.getFilms().contains(someFilm));
 	}
 }
