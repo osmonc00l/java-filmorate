@@ -64,9 +64,7 @@ public class UserDbStorage extends BaseDb<User> implements UserStorage {
     public Optional<User> getUserById(long id) {
         Optional<User> userOptional = findOne(FIND_BY_ID_QUERY, id);
         userOptional.ifPresent(
-                user -> user.setFriends(new HashSet<>(
-                        friendshipStorage.
-                                findFriendsIds(id))));
+                user -> user.setFriends(new HashSet<>(friendshipStorage.findFriendsIds(id))));
         return userOptional;
     }
 
