@@ -43,17 +43,27 @@ public class FilmController {
     }
 
     @PutMapping(likePath + "/{userId}")
-    public ResponseEntity<Film> likeFilm(@PathVariable long id, @PathVariable long userId) {
+    public ResponseEntity<?> likeFilm(@PathVariable long id, @PathVariable long userId) {
+        filmService.likeFilm(id, userId);
         return ResponseEntity
                 .status(200)
-                .body(filmService.likeFilm(id, userId));
+                .build();
     }
 
     @DeleteMapping(likePath + "/{userId}")
-    public ResponseEntity<Film> removeFilm(@PathVariable long id, @PathVariable long userId) {
+    public ResponseEntity<?> removeFilm(@PathVariable long id, @PathVariable long userId) {
+        filmService.removeLike(id, userId);
         return ResponseEntity
                 .status(200)
-                .body(filmService.removeLike(id, userId));
+                .build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Film> getFilm(@PathVariable Long id) {
+        log.debug("Получен запрос на получение фильма с ID: {}", id);
+        return ResponseEntity
+                .status(200)
+                .body(filmService.getFilmById(id));
     }
 
     @GetMapping("/popular")
