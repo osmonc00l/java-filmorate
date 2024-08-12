@@ -17,8 +17,8 @@ import java.util.Optional;
 public class GenresDbStorage extends BaseDb<Genre> implements GenresStorage {
     private RowMapper<Genre> genreIdRowMapper;
 
-    private static final String FIND_ALL_QUERY = "select * from genres";
-    private static final String FIND_BY_ID_QUERY = "select * from genres where id = ?";
+    private static final String FIND_ALL_QUERY = "SELECT * FROM genres";
+    private static final String FIND_BY_ID_QUERY = "SELECT * FROM genres where id = ?";
     private static final String FIND_BY_FILM_ID_QUERY = "SELECT fg.genre_id, g.name FROM film_genres AS fg " +
             "JOIN genres AS g ON fg.genre_id = g.id WHERE film_id = ?";
 

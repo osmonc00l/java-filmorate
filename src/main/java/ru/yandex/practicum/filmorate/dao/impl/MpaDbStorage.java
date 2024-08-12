@@ -14,8 +14,8 @@ import java.util.Optional;
 @Slf4j
 @Repository
 public class MpaDbStorage extends BaseDb<Mpa> implements MpaStorage {
-    private static final String FIND_ALL_QUERY = "select * from Mpa";
-    private static final String FIND_BY_ID_QUERY = "select * from Mpa where id = ?";
+    private static final String FIND_ALL_QUERY = "SELECT * FROM Mpa";
+    private static final String FIND_BY_ID_QUERY = "SELECT * FROM Mpa where id = ?";
 
     public MpaDbStorage(JdbcTemplate jdbcTemplate, RowMapper<Mpa> rowMapper) {
         super(jdbcTemplate, rowMapper);

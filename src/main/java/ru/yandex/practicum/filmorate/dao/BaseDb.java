@@ -39,7 +39,7 @@ public abstract class BaseDb<T> {
 
     protected void update(String query, Object... params) {
         int rowsUpdated = jdbcTemplate.update(query, params);
-        if (rowsUpdated ==0) {
+        if (rowsUpdated == 0) {
             throw new RuntimeException("Не удалось обновить данные");
         }
     }
