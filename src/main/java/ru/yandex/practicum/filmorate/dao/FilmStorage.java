@@ -12,7 +12,7 @@ public interface FilmStorage {
 
     public Collection<Film> getFilms();
 
-    public void likeFilm(long Id, long userId);
+    public void likeFilm(long id, long userId);
 
     public void removeLike(long filmId, long useId);
 }
