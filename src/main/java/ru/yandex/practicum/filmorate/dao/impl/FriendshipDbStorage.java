@@ -25,7 +25,7 @@ public class FriendshipDbStorage extends BaseDb implements FriendshipStorage {
     @Override
     public List<Long> findFriendsIds(long userId) {
         List<Friendship> allFriendships = findMany(FIND_FRIENDS_BY_USER_ID, userId);
-        return allFriendships.stream().map(Friendship::getFriend_id).toList();
+        return allFriendships.stream().map(Friendship::getFriendId).toList();
     }
 
     @Override

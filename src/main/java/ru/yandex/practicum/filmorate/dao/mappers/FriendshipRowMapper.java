@@ -13,8 +13,8 @@ public class FriendshipRowMapper implements RowMapper<Friendship> {
     public Friendship mapRow(ResultSet rs, int rowNum) throws SQLException {
         Friendship friendship = new Friendship();
         friendship.setId(rs.getInt("id"));
-        friendship.setUser_id(rs.getInt("user1_id"));
-        friendship.setFriend_id(rs.getInt("user2_id"));
+        friendship.setUserId(rs.getInt("user1_id"));
+        friendship.setFriendId(rs.getInt("user2_id"));
         return friendship;
     }
 }
