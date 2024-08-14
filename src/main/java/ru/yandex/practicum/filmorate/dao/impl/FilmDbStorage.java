@@ -23,7 +23,6 @@ public class FilmDbStorage extends BaseDb<Film> implements FilmStorage {
     private final MpaStorage mpaDbStorage;
     private final GenresStorage genresDbStorage;
 
-
     private static final String FIND_ALL_QUERY = "SELECT * FROM films";
     private static final String FIND_BY_ID_QUERY = "SELECT * FROM films WHERE id = ?";
     private static final String INSERT_QUERY = "INSERT INTO films (name, description, release_date, " +

@@ -27,6 +27,7 @@ public class FilmService {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
     }
+
     public Collection<FilmDto> getFilms() {
         log.info("Получен запрос на получение всех фильмов");
         return FilmMapper.INSTANCE.toDto(filmStorage.getFilms());

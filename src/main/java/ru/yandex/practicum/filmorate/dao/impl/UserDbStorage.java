@@ -83,5 +83,4 @@ public class UserDbStorage extends BaseDb<User> implements UserStorage {
     public void createFriendship(long userId, long friendId) {
         friendshipStorage.createFriendship(userId, friendId);
     }
-
 }

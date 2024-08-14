@@ -42,7 +42,6 @@ public class InMemoryUserStorage implements UserStorage {
                 .orElse(0);
     }
 
-
     @Override
     public Optional<User> getUserById(Long userId) {
         log.info("Поиск пользователя по ID {}", userId);

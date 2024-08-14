@@ -103,6 +103,4 @@ public class UserService {
                 .map(UserMapper.INSTANCE::toDto)
                 .collect(Collectors.toList());
     }
-
-
 }

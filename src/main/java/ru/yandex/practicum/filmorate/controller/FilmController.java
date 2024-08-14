@@ -17,6 +17,7 @@ import java.util.Collection;
 @Slf4j
 public class FilmController {
     private final FilmService filmService;
+
     @GetMapping
     public ResponseEntity<Collection<FilmDto>> getFilms() {
         return ResponseEntity
