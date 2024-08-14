@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.mappers.GenreMapper;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j

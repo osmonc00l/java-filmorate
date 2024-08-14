@@ -1,13 +1,11 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mappers.FilmMapper;
 import ru.yandex.practicum.filmorate.mappers.MpaMapper;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -17,7 +15,6 @@ import ru.yandex.practicum.filmorate.validation.FilmByLikeComparator;
 import ru.yandex.practicum.filmorate.validation.FilmValidator;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service

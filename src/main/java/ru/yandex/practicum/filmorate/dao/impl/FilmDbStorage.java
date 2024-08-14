@@ -12,7 +12,6 @@ import ru.yandex.practicum.filmorate.dao.mappers.UserIdRowMapper;
 import ru.yandex.practicum.filmorate.dto.GenreDto;
 import ru.yandex.practicum.filmorate.mappers.GenreMapper;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.Date;
@@ -92,7 +91,7 @@ public class FilmDbStorage extends BaseDb<Film> implements FilmStorage {
     @Override
     public List<Film> getFilms() {
         log.debug("Получение списка фильмов");
-        List<Film> allFilms = new ArrayList<Film>();
+        List<Film> allFilms = new ArrayList<>();
         for (Film film : findMany(FIND_ALL_QUERY)) {
             film.setLikes(new HashSet<>(getLikesFromFilm(film.getId())));
             allFilms.add(film);
