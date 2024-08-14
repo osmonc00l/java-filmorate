@@ -15,7 +15,7 @@ import java.util.Optional;
 @Slf4j
 @Repository
 public class GenresDbStorage extends BaseDb<Genre> implements GenresStorage {
-    private RowMapper<Genre> genreIdRowMapper;
+    private final RowMapper<Genre> genreIdRowMapper;
 
     private static final String FIND_ALL_QUERY = "SELECT * FROM genres";
     private static final String FIND_BY_ID_QUERY = "SELECT * FROM genres where id = ?";
