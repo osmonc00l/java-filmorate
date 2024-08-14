@@ -1,6 +1,9 @@
 package ru.yandex.practicum.filmorate.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -9,11 +12,15 @@ import java.util.Set;
 
 @Data
 public class UserDto {
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private long id;
+    private Long id;
+    @NotBlank
+    @Pattern(regexp = "^\\S+$", message = "Логин не может содержать пробелы")
     private String login;
     private String name;
+    @Email
     private String email;
+    @Past(message = "Дата рождения не может быть в будущем")
     private LocalDate birthday;
+
     private Set<Long> friends = new HashSet<>();
 }

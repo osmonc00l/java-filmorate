@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -20,8 +21,13 @@ public class InMemoryFilmStorage implements FilmStorage {
         films.put(film.getId(), film);
         log.info("Фильм с id {} был добавлен", film.getId());
         return film;
+    }
 
-
+    @Override
+    public Film updateFilm(Film film) {
+        log.info("Обновление фильма с названием: {}", film.getName());
+        films.put(film.getId(), film);
+        return film;
     }
 
     public Film removeFilm(Film film) {
@@ -30,15 +36,15 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Optional<Film> getFilmById(long filmId) {
+    public Optional<Film> getFilmById(Long filmId) {
         log.info("Поиск фильма по id: {}", filmId);
         return Optional.ofNullable(films.get(filmId));
     }
 
     @Override
-    public Collection<Film> getFilms() {
+    public List<Film> getFilms() {
         log.info("Получение списка всех фильмов");
-        return films.values();
+        return (List<Film>) films.values();
     }
 
     public void likeFilm(long id, long userId) {

@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
@@ -19,47 +20,43 @@ import java.util.Optional;
 @Slf4j
 public class FilmController {
     private final FilmService filmService;
-    private final String likePath = "/{id}/like";
-
     @GetMapping
-    public ResponseEntity<Collection<Film>> getFilms() {
+    public ResponseEntity<Collection<FilmDto>> getFilms() {
         return ResponseEntity
                 .status(200)
                 .body(filmService.getFilms());
     }
 
     @PostMapping
-    public ResponseEntity<Film> createFilm(@Valid @RequestBody Film film) {
+    public ResponseEntity<FilmDto> createFilm(@Valid @RequestBody FilmDto filmDto) {
         return ResponseEntity
                 .status(201)
-                .body(filmService.createFilm(film));
+                .body(filmService.createFilm(filmDto));
     }
 
     @PutMapping
-    public ResponseEntity<Film> updateFilm(@Valid @RequestBody Film film) {
+    public ResponseEntity<FilmDto> updateFilm(@Valid @RequestBody FilmDto filmDto) {
         return ResponseEntity
                 .status(200)
-                .body(filmService.updateFilm(film));
+                .body(filmService.updateFilm(filmDto));
     }
 
-    @PutMapping(likePath + "/{userId}")
+    @PutMapping("/{id}/like/{userId}")
     public ResponseEntity<?> likeFilm(@PathVariable long id, @PathVariable long userId) {
+        log.debug("Получен запрос на создание лайка фильму с id={} пользователем с Id={}", id, userId);
         filmService.likeFilm(id, userId);
-        return ResponseEntity
-                .status(200)
-                .build();
+        return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping(likePath + "/{userId}")
+    @DeleteMapping("/{id}/like/{userId}")
     public ResponseEntity<?> removeFilm(@PathVariable long id, @PathVariable long userId) {
+        log.debug("Получен запрос на создание лайка фильму с id={} пользователем с Id={}", id, userId);
         filmService.removeLike(id, userId);
-        return ResponseEntity
-                .status(200)
-                .build();
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Film> getFilm(@PathVariable Long id) {
+    public ResponseEntity<FilmDto> getFilm(@PathVariable Long id) {
         log.debug("Получен запрос на получение фильма с ID: {}", id);
         return ResponseEntity
                 .status(200)
@@ -67,8 +64,7 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    @ResponseBody
-    public ResponseEntity<List<Film>> getMostPopular(@RequestParam Optional<Long> count) {
+    public ResponseEntity<Collection<FilmDto>> getMostPopular(@RequestParam(defaultValue = "10") int count) {
         return ResponseEntity
                 .status(200)
                 .body(filmService.getMostPopularFilms(count));

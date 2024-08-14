@@ -1,14 +1,19 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.mappers.FilmMapper;
+import ru.yandex.practicum.filmorate.mappers.MpaMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.dao.UserStorage;
+import ru.yandex.practicum.filmorate.validation.FilmByLikeComparator;
 import ru.yandex.practicum.filmorate.validation.FilmValidator;
 
 import java.util.*;
@@ -25,51 +30,39 @@ public class FilmService {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
     }
-
-    public Collection<Film> getFilms() {
+    public Collection<FilmDto> getFilms() {
         log.info("Получен запрос на получение всех фильмов");
-        return filmStorage.getFilms();
+        return FilmMapper.INSTANCE.toDto(filmStorage.getFilms());
     }
 
-    public Film createFilm(Film film) {
+    public FilmDto createFilm(FilmDto filmDto) {
+        log.info("Получен запрос на создание фильма: {}", filmDto);
+        Film film = FilmMapper.INSTANCE.toEntity(filmDto);
         FilmValidator.isValid(film);
-        try {
-            log.info("Получен запрос на создание фильма: {}", film);
-            return filmStorage.createFilm(film);
-        } catch (Exception exception) {
-            log.warn(exception.getMessage(), exception);
-            throw exception;
-        }
+        return FilmMapper.INSTANCE.toDto(filmStorage.createFilm(film));
     }
 
-    public Film updateFilm(Film film) {
-        FilmValidator.isValid(film);
-        try {
-            if (Objects.isNull(film.getId())) {
-                throw new ValidationException("Id должен быть указан");
-            }
-            Long id = film.getId();
-            log.info("Получен запрос на обновление фильма: {}", film);
-            Film oldFilm = filmStorage.getFilmById(id).orElseThrow(() -> new FilmNotFoundException(id));
-            log.info("Фильм с id={} найден", film);
-            oldFilm.setName(film.getName());
-            oldFilm.setDescription(film.getDescription());
-            oldFilm.setReleaseDate(film.getReleaseDate());
-            oldFilm.setDuration(film.getDuration());
-            oldFilm.setGenres(film.getGenres());
-            oldFilm.setMpa(film.getMpa());
-            log.info("Фильм успешно обновлен");
-            return filmStorage.createFilm(oldFilm);
-        } catch (Exception exception) {
-            log.error(exception.getMessage(), exception);
-            throw exception;
-        }
+    public FilmDto updateFilm(FilmDto filmDto) {
+        Long id = filmDto.getId();
+        log.info("Получен запрос на обновление фильма: {}", filmDto);
+        Film storedFilm = filmStorage.getFilmById(id).orElseThrow(() -> new FilmNotFoundException(id));
+        log.info("Фильм с id={} найден", filmDto.getId());
+        storedFilm.setName(filmDto.getName());
+        storedFilm.setDescription(filmDto.getDescription());
+        storedFilm.setReleaseDate(filmDto.getReleaseDate());
+        storedFilm.setDuration(filmDto.getDuration());
+        storedFilm.setMpa(MpaMapper.INSTANCE.toEntity(filmDto.getMpa()));
+        log.info("Фильм успешно обновлен");
+        return FilmMapper.INSTANCE.toDto(filmStorage.updateFilm(storedFilm));
+
     }
 
     public void likeFilm(long filmId, long userId) {
         log.info("Пользователю {} понравился фильм {}", userId, filmId);
         userStorage.getUserById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+        log.info("Фильм найден");
         filmStorage.likeFilm(filmId, userId);
+        log.info("Лайк добавлен");
     }
 
     public void removeLike(long filmId, long userId) {
@@ -78,17 +71,19 @@ public class FilmService {
         filmStorage.removeLike(filmId, userId);
     }
 
-    public List<Film> getMostPopularFilms(Optional<Long> count) {
+    public Collection<FilmDto> getMostPopularFilms(int count) {
         log.info("Запрос на получение популярных фильмов");
         return filmStorage.getFilms().stream()
-                .sorted(Comparator.comparingInt(a -> -a.getLikes().size()))
-                .limit(count.orElse(10L))
-                .collect(Collectors.toList());
+                .sorted(new FilmByLikeComparator().reversed())
+                .limit(count)
+                .map(FilmMapper.INSTANCE::toDto)
+                .toList();
     }
 
-    public Film getFilmById(Long id) {
+    public FilmDto getFilmById(Long id) {
         log.info("Запрос на получение фильма по ID {}", id);
-        Optional<Film> film = filmStorage.getFilmById(id);
-        return film.orElseThrow(() -> new FilmNotFoundException(id));
+        Film film = filmStorage.getFilmById(id)
+                .orElseThrow(() -> new FilmNotFoundException(id));
+        return FilmMapper.INSTANCE.toDto(film);
     }
 }

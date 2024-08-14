@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.validation;
 
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
+import ru.yandex.practicum.filmorate.dto.GenreDto;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -29,7 +30,7 @@ public class FilmValidator {
             throw new ValidationException("Оценка фильма может быть только от 1 до 5");
         }
         if (!Objects.isNull(film.getGenres())) {
-            for (Genre genre : film.getGenres()) {
+            for (GenreDto genre: film.getGenres()) {
                 if (genre.getId() > 6 || genre.getId() < 1) {
                     throw new ValidationException("Некорректное значение жанра");
                 }

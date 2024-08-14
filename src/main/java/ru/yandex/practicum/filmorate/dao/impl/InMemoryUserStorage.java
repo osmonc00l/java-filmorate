@@ -3,12 +3,10 @@ package ru.yandex.practicum.filmorate.dao.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dao.UserStorage;
+import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -17,10 +15,16 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User createUser(User user) {
-        user.setId(getNextId());
+        user.setId(findMaxId() + 1);
         log.info("Новому пользователю присвоен id {}", user.getId());
         users.put(user.getId(), user);
         log.info("Пользователь с id {} был добавлен", user.getId());
+        return user;
+    }
+
+    @Override
+    public User updateUser(User user) {
+        users.put(user.getId(), user);
         return user;
     }
 
@@ -30,7 +34,18 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public Optional<User> getUserById(long userId) {
+    public Long findMaxId() {
+        log.info("Поиск максимального значения Id среди существующих пользователей");
+        return users.keySet()
+                .stream()
+                .mapToLong(id -> id)
+                .max()
+                .orElse(0);
+    }
+
+
+    @Override
+    public Optional<User> getUserById(Long userId) {
         log.info("Поиск пользователя по ID {}", userId);
         return Optional.ofNullable(users.get(userId));
     }
@@ -48,9 +63,9 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public Collection<User> getUsers() {
+    public List<User> getUsers() {
         log.info("Получение списка всех пользователей");
-        return users.values();
+        return new ArrayList<>(users.values());
     }
 
     private long getNextId() {

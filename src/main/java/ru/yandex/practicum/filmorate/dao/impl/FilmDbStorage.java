@@ -9,6 +9,8 @@ import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.dao.GenresStorage;
 import ru.yandex.practicum.filmorate.dao.MpaStorage;
 import ru.yandex.practicum.filmorate.dao.mappers.UserIdRowMapper;
+import ru.yandex.practicum.filmorate.dto.GenreDto;
+import ru.yandex.practicum.filmorate.mappers.GenreMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -19,8 +21,8 @@ import java.util.*;
 @Slf4j
 @Repository
 public class FilmDbStorage extends BaseDb<Film> implements FilmStorage {
-    final MpaStorage mpaDbStorage;
-    final GenresStorage genresDbStorage;
+    private final MpaStorage mpaDbStorage;
+    private final GenresStorage genresDbStorage;
 
 
     private static final String FIND_ALL_QUERY = "SELECT * FROM films";
@@ -49,32 +51,40 @@ public class FilmDbStorage extends BaseDb<Film> implements FilmStorage {
     @Override
     public Film createFilm(Film film) {
         log.info("Сохранение фильма: {}", film);
-        Long id = film.getId();
-        if (id == null) {
-            id = insert(INSERT_QUERY,
-                    film.getName(),
-                    film.getDescription(),
-                    Date.valueOf(film.getReleaseDate()),
-                    film.getDuration(),
-                    film.getMpa().getId()
-            );
-            film.setId(id);
-        } else {
-            update(UPDATE_QUERY,
-                    film.getName(),
-                    film.getDescription(),
-                    Date.valueOf(film.getReleaseDate()),
-                    film.getDuration(),
-                    film.getMpa().getId(),
-                    id);
-        }
+        Long id = insert(INSERT_QUERY,
+                film.getName(),
+                film.getDescription(),
+                Date.valueOf(film.getReleaseDate()),
+                film.getDuration(),
+                film.getMpa().getId()
+        );
+        film.setId(id);
+
         for (Long like : film.getLikes()) {
             likeFilm(id, like);
         }
-        if (!Objects.isNull(film.getGenres())) {
-            for (Genre genre : film.getGenres()) {
-                insert(INSERT_GENRES_QUERY, id, genre.getId());
-            }
+        for (GenreDto genre : film.getGenres()) {
+            insert(INSERT_GENRES_QUERY, id, genre.getId());
+        }
+        return film;
+
+    }
+
+    @Override
+    public Film updateFilm(Film film) {
+        Long id = film.getId();
+        update(UPDATE_QUERY,
+                film.getName(),
+                film.getDescription(),
+                Date.valueOf(film.getReleaseDate()),
+                film.getDuration(),
+                film.getMpa().getId(),
+                id);
+        for (Long like : film.getLikes()) {
+            likeFilm(id, like);
+        }
+        for (GenreDto genre : film.getGenres()) {
+            insert(INSERT_GENRES_QUERY, id, genre.getId());
         }
         return film;
     }
@@ -91,7 +101,7 @@ public class FilmDbStorage extends BaseDb<Film> implements FilmStorage {
     }
 
     @Override
-    public Optional<Film> getFilmById(long id) {
+    public Optional<Film> getFilmById(Long id) {
         log.debug("Выполнение метода findById");
         Optional<Film> filmOptional = findOne(FIND_BY_ID_QUERY, id);
 
@@ -103,15 +113,13 @@ public class FilmDbStorage extends BaseDb<Film> implements FilmStorage {
             Mpa mpa = film.getMpa();
             int mpaId = mpa.getId();
             film.setMpa(mpaDbStorage.findById(mpaId).orElseThrow());
-            film.setGenres(genresDbStorage.findByFilmId(id));
+            List<GenreDto> genreDto = new ArrayList<>(genresDbStorage.findByFilmId(id)).stream()
+            .map(GenreMapper.INSTANCE::toDto)
+            .toList();
+            film.setGenres(genreDto);
             log.debug("Жанры для данного фильма установлены");
         }
         return filmOptional;
-    }
-
-    public Long findMaxId() {
-        log.debug("Поиск максимального id");
-        return super.findMaxId(FILM_MAX_ID_QUERY);
     }
 
     @Override

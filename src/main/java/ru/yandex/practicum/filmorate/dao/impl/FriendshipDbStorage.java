@@ -31,6 +31,7 @@ public class FriendshipDbStorage extends BaseDb implements FriendshipStorage {
     @Override
     public void createFriendship(long userId, long friendId) {
         if (findOne(CHECK_FRIENDSHIP_QUERY, userId, friendId).isEmpty()) {
+            System.out.println("Проверка апворппралрго");
             insert(CREATE_FRIENDSHIP_REQUEST, userId, friendId);
         }
     }

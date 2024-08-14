@@ -1,12 +1,17 @@
 package ru.yandex.practicum.filmorate.dao.impl;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.dao.BaseDb;
 import ru.yandex.practicum.filmorate.dao.FriendshipStorage;
 import ru.yandex.practicum.filmorate.dao.UserStorage;
+import ru.yandex.practicum.filmorate.dto.UserDto;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.Date;
@@ -37,21 +42,23 @@ public class UserDbStorage extends BaseDb<User> implements UserStorage {
     @Override
     public User createUser(User user) {
         log.info("Сохранение пользователя: {}", user);
-        if (user.getId() == null) {
-            long id = insert(INSERT_QUERY,
-                    user.getLogin(),
-                    user.getName(),
-                    user.getEmail(),
-                    Date.valueOf(user.getBirthday()));
-            user.setId(id);
-        } else {
-            update(UPDATE_QUERY,
-                    user.getLogin(),
-                    user.getName(),
-                    user.getEmail(),
-                    Date.valueOf(user.getBirthday()),
-                    user.getId());
-        }
+        long id = insert(INSERT_QUERY,
+                user.getLogin(),
+                user.getName(),
+                user.getEmail(),
+                Date.valueOf(user.getBirthday()));
+        user.setId(id);
+        return user;
+    }
+
+    @Override
+    public User updateUser(User user) {
+        update(UPDATE_QUERY,
+                user.getLogin(),
+                user.getName(),
+                user.getEmail(),
+                Date.valueOf(user.getBirthday()),
+                user.getId());
         return user;
     }
 
@@ -61,7 +68,7 @@ public class UserDbStorage extends BaseDb<User> implements UserStorage {
     }
 
     @Override
-    public Optional<User> getUserById(long id) {
+    public Optional<User> getUserById(Long id) {
         Optional<User> userOptional = findOne(FIND_BY_ID_QUERY, id);
         userOptional.ifPresent(
                 user -> user.setFriends(new HashSet<>(friendshipStorage.findFriendsIds(id))));

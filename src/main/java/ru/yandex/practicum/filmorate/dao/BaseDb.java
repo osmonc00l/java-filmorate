@@ -21,10 +21,8 @@ public abstract class BaseDb<T> {
     protected Optional<T> findOne(String query, Object... params) {
         try {
             T result = jdbcTemplate.queryForObject(query, rowMapper, params);
-            log.debug("Фильм в базе найден");
             return Optional.ofNullable(result);
         } catch (EmptyResultDataAccessException ignored) {
-            log.debug("Фильм не найден в базе");
             return Optional.empty();
         }
     }

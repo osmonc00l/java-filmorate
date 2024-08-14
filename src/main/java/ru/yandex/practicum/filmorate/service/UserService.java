@@ -2,10 +2,13 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dto.UserDto;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.mappers.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.dao.UserStorage;
 import ru.yandex.practicum.filmorate.validation.UserValidator;
@@ -22,39 +25,38 @@ public class UserService {
         this.userStorage = userStorage;
     }
 
-    public Collection<User> getUsers() {
-        return userStorage.getUsers();
+    public List<UserDto> getUsers() {
+        return UserMapper.INSTANCE.toDto(userStorage.getUsers());
     }
 
-    public User createUser(User user) {
-        try {
-            UserValidator.isValid(user);
-            log.info("Создание пользователя с ID {}", user.getId());
-            return userStorage.createUser(user);
-        } catch (Exception exception) {
-            log.warn(exception.getMessage(), exception);
-            throw exception;
+    public UserDto getUserById(long id) {
+        Optional<User> user = userStorage.getUserById(id);
+        if (user.isEmpty()) {
+            log.error("Пользователь с id {} не найден", id);
+            throw new NotFoundException(id);
         }
+        return UserMapper.INSTANCE.toDto(user.get());
     }
 
-    public User updateUser(User user) {
-        try {
-            UserValidator.isValid(user);
-            if (Objects.isNull(user.getId())) {
-                throw new ValidationException("Id должен быть указан");
-            }
-            Long id = user.getId();
-            User oldUser = userStorage.getUserById(id).orElseThrow(() -> new UserNotFoundException(id));
-            oldUser.setEmail(user.getEmail());
-            oldUser.setLogin(user.getLogin());
-            oldUser.setName(user.getName());
-            oldUser.setBirthday(user.getBirthday());
-            log.info("Обновление пользователя с ID {}", id);
-            return userStorage.createUser(oldUser);
-        } catch (Exception exception) {
-            log.warn(exception.getMessage(), exception);
-            throw exception;
-        }
+    public UserDto createUser(UserDto userDto) {
+        UserValidator.isValid(userDto);
+        log.info("Создание пользователя с ID {}", userDto.getId());
+        System.out.println(userDto.getFriends());
+        User user = UserMapper.INSTANCE.toEntity(userDto);
+        return UserMapper.INSTANCE.toDto(userStorage.createUser(user));
+    }
+
+    public UserDto updateUser(UserDto userDto) {
+        UserValidator.isValid(userDto);
+        Long id = userDto.getId();
+        System.out.println(id);
+        User foundUser = userStorage.getUserById(id).orElseThrow(() -> new UserNotFoundException(id));
+        foundUser.setEmail(userDto.getEmail());
+        foundUser.setLogin(userDto.getLogin());
+        foundUser.setName(userDto.getName());
+        foundUser.setBirthday(userDto.getBirthday());
+        log.info("Обновление пользователя с ID {}", id);
+        return UserMapper.INSTANCE.toDto(userStorage.updateUser(foundUser));
     }
 
     public void addFriend(Long id, Long friendId) {
@@ -79,16 +81,17 @@ public class UserService {
         userStorage.removeFriendship(id, friendId);
     }
 
-    public Collection<User> getFriends(Long id) {
+    public Collection<UserDto> getFriends(Long id) {
         log.info("Получение списка друзей пользователя {} ", id);
         User user = userStorage.getUserById(id).orElseThrow(() -> new UserNotFoundException(id));
         return user.getFriends().stream()
                 .map(userStorage::getUserById)
                 .map(Optional::orElseThrow)
+                .map(UserMapper.INSTANCE::toDto)
                 .collect(Collectors.toList());
     }
 
-    public Collection<User> getCommonFriends(Long id, Long secondId) {
+    public Collection<UserDto> getCommonFriends(Long id, Long secondId) {
         log.info("Получение общих друзей у пользователя {} и пользователя {}", id, secondId);
         Set<Long> firstUserFriends =
                 userStorage.getUserById(id).orElseThrow(() -> new UserNotFoundException(id)).getFriends();
@@ -99,6 +102,7 @@ public class UserService {
                 .filter(secondUserFriends::contains)
                 .map(userStorage::getUserById)
                 .map(Optional::orElseThrow)
+                .map(UserMapper.INSTANCE::toDto)
                 .collect(Collectors.toList());
     }
 
