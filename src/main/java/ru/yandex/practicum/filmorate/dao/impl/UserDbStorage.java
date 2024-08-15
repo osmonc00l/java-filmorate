@@ -70,7 +70,7 @@ public class UserDbStorage extends BaseDb<User> implements UserStorage {
         return userOptional;
     }
 
-    public Long findMaxId() {
+    private Long findMaxId() {
         return super.findMaxId(USER_MAX_ID_QUERY);
     }
 

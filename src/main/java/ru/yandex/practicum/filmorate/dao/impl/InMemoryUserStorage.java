@@ -5,7 +5,12 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dao.UserStorage;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.List;
+import java.util.ArrayList;
+
 
 @Slf4j
 @Component
@@ -14,7 +19,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User createUser(User user) {
-        user.setId(findMaxId() + 1);
+        user.setId(getNextId());
         log.info("Новому пользователю присвоен id {}", user.getId());
         users.put(user.getId(), user);
         log.info("Пользователь с id {} был добавлен", user.getId());
@@ -30,16 +35,6 @@ public class InMemoryUserStorage implements UserStorage {
     public User removeUser(User user) {
         log.info("Удаление фильма {}", user);
         return users.remove(user.getId());
-    }
-
-    @Override
-    public Long findMaxId() {
-        log.info("Поиск максимального значения Id среди существующих пользователей");
-        return users.keySet()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
     }
 
     @Override

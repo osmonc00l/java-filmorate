@@ -39,7 +39,6 @@ public class UserService {
     public UserDto createUser(UserDto userDto) {
         UserValidator.isValid(userDto);
         log.info("Создание пользователя с ID {}", userDto.getId());
-        System.out.println(userDto.getFriends());
         User user = UserMapper.INSTANCE.toEntity(userDto);
         return UserMapper.INSTANCE.toDto(userStorage.createUser(user));
     }
@@ -47,7 +46,6 @@ public class UserService {
     public UserDto updateUser(UserDto userDto) {
         UserValidator.isValid(userDto);
         Long id = userDto.getId();
-        System.out.println(id);
         User foundUser = userStorage.getUserById(id).orElseThrow(() -> new UserNotFoundException(id));
         foundUser.setEmail(userDto.getEmail());
         foundUser.setLogin(userDto.getLogin());

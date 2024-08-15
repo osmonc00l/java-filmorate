@@ -14,8 +14,6 @@ public interface UserStorage {
 
     List<User> getUsers();
 
-    Long findMaxId();
-
     void removeFriendship(long userId, long friendId);
 
     void createFriendship(long userId, long friendId);
