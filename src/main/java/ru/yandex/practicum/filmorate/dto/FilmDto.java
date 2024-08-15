@@ -1,22 +1,26 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.dto;
 
+import jakarta.validation.Valid;
 import lombok.Data;
-import ru.yandex.practicum.filmorate.dto.GenreDto;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
 @Data
-public class Film {
+public class FilmDto {
     private Long id;
     private String name;
     private String description;
     private LocalDate releaseDate;
     private int duration;
     private List<GenreDto> genres;
-    private Mpa mpa = new Mpa();
+    private MpaDto mpa = new MpaDto();
     private Set<Long> likes = new HashSet<>();
+
+    public @Valid List<GenreDto> getGenres() {
+        return genres == null ? Collections.emptyList() : genres;
+    }
 }
